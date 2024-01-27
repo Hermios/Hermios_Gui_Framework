@@ -25,7 +25,8 @@
 		"circuit_connector_definitions",
 		"universal_connector_template",
 		"__DebugAdapter",
-		"__Profiler"
+		"__Profiler",
+		"list_events"
 	],
 	"Lua.workspace.ignoreDir": [
 			".vscode",
