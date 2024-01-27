@@ -27,7 +27,7 @@ os.rename(previous_zip_file_name,zip_file_name)
 
 # remove all non factorio directories
 os.remove(f"./{zip_file_name}/README.md")
-os.remove(f"./{zip_file_name}/.gitignore")
+#os.remove(f"./{zip_file_name}/.gitignore")
 [shutil.rmtree(d) for d in glob(f"./{zip_file_name}/.*")]
 
 ################################# Set info.json ###############################
