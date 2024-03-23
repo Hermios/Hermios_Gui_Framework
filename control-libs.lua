@@ -63,3 +63,9 @@ end)
 table.insert(list_events.on_gui_opened,function (event)
 	open_gui(event.entity)
 end)
+
+table.insert(list_events.on_gui_closed,function ()
+	if global.current_gui and global.current_gui.valid then
+		global.current_gui.destroy()
+	end
+end)

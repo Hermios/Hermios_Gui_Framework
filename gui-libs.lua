@@ -1,7 +1,7 @@
 custom_guis={}
 custom_gui_prototypes={}
 custom_gui_elements={}
-local current_gui
+global.current_gui=nil
 local selected_entity_id
 local _modname
 
@@ -111,12 +111,7 @@ function open_gui(entity)
     if gui.clear_default then
         game.get_player(1).opened=game.get_player(1).gui[gui.position]
     end
-    current_gui=add_guielement(game.get_player(1).gui[gui.position],gui.gui,global.custom_entities[selected_entity_id].control_behavior)
-    table.insert(list_events.on_gui_closed,function ()
-        if current_gui and current_gui.valid then
-            current_gui.destroy()
-        end
-    end)
+    global.current_gui=add_guielement(game.get_player(1).gui[gui.position],gui.gui,global.custom_entities[selected_entity_id].control_behavior)
 end
 
 function add_row(lua_gui_element,data)
@@ -138,7 +133,7 @@ function remove_row(lua_gui_element)
 end
 
 function update_control_behavior()
-    data,index=get_lua_gui_element_data(current_gui)
+    data,index=get_lua_gui_element_data(global.current_gui)
     global.custom_entities[selected_entity_id].control_behavior=data
     if global.custom_entities[selected_entity_id].on_gui_changed then
         global.custom_entities[selected_entity_id]:on_gui_changed()
