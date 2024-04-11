@@ -1,7 +1,7 @@
 custom_guis={}
 custom_gui_prototypes={}
 custom_gui_elements={}
-local current_gui
+global.current_gui=nil
 local selected_entity_id
 local _modname
 
@@ -49,19 +49,27 @@ local function set_lua_gui_element_data(lua_gui_element,data)
 end
 
 local function get_lua_gui_element_data(lua_gui_element)
-    if lua_gui_element.tags.get_or_set then
-        return _G[lua_gui_element.tags.get_or_set](lua_gui_element),lua_gui_element.tags.id
-    end
-    local type_value=ELEMENTTYPE_VALUE[lua_gui_element.type:gsub("-","_")]
-    if type_value then
-        return ((type(type_value)=="function" and type_value(lua_gui_element))
-            or (type(type_value)=="table" and lua_gui_element[type_value[1]])),lua_gui_element.tags.id
+    if lua_gui_element.tags.id then
+        if lua_gui_element.tags.get_or_set then
+            return _G[lua_gui_element.tags.get_or_set](lua_gui_element),lua_gui_element.tags.id
+        end
+        local type_value=ELEMENTTYPE_VALUE[lua_gui_element.type:gsub("-","_")]
+        if type_value then
+            return ((type(type_value)=="function" and type_value(lua_gui_element))
+                or (type(type_value)=="table" and lua_gui_element[type_value[1]])),lua_gui_element.tags.id
+        end
     end
     local result={}
     for _,child in pairs(lua_gui_element.children) do
-        data,index=get_lua_gui_element_data(child)
-        if data and index then
-            result[index]=data
+        local data,index=get_lua_gui_element_data(child)
+        if data then
+            if index then
+                result[index]=data
+            else
+                for k,v in pairs(data) do
+                    result[k]=v
+                end
+            end
         end
     end
     return result,lua_gui_element.tags.id
@@ -111,12 +119,7 @@ function open_gui(entity)
     if gui.clear_default then
         game.get_player(1).opened=game.get_player(1).gui[gui.position]
     end
-    current_gui=add_guielement(game.get_player(1).gui[gui.position],gui.gui,global.custom_entities[selected_entity_id].control_behavior)
-    table.insert(list_events.on_gui_closed,function ()
-        if current_gui and current_gui.valid then
-            current_gui.destroy()
-        end
-    end)
+    global.current_gui=add_guielement(game.get_player(1).gui[gui.position],gui.gui,global.custom_entities[selected_entity_id].control_behavior)
 end
 
 function add_row(lua_gui_element,data)
@@ -138,7 +141,7 @@ function remove_row(lua_gui_element)
 end
 
 function update_control_behavior()
-    data,index=get_lua_gui_element_data(current_gui)
+    data,index=get_lua_gui_element_data(global.current_gui)
     global.custom_entities[selected_entity_id].control_behavior=data
     if global.custom_entities[selected_entity_id].on_gui_changed then
         global.custom_entities[selected_entity_id]:on_gui_changed()
