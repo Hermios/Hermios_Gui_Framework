@@ -7,14 +7,17 @@ list_events.on_gui_action={}
 
 local function update_gui(event)
 	if event.element.get_mod()==get_gui_modname() then
-		if event.element.tags.id then
-			update_control_behavior()
-		end
 		if event.element.tags.on_action then
 			_G[event.element.tags.on_action](event.element)
 		end
+		if event.element.tags.id then
+			update_control_behavior()
+		end
 	end
 end
+table.insert(list_events.on_gui_action,function (event)
+	update_gui(event)
+end)
 
 table.insert(list_events.on_gui_checked_state_changed,function (event)
 	for _,f in pairs(list_events.on_gui_action) do
@@ -55,9 +58,6 @@ table.insert(list_events.on_gui_value_changed,function (event)
 	for _,f in pairs(list_events.on_gui_action) do
 		f(event)
 	end
-end)
-table.insert(list_events.on_gui_action,function (event)
-	update_gui(event)
 end)
 
 table.insert(list_events.on_gui_opened,function (event)

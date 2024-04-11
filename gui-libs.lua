@@ -49,19 +49,27 @@ local function set_lua_gui_element_data(lua_gui_element,data)
 end
 
 local function get_lua_gui_element_data(lua_gui_element)
-    if lua_gui_element.tags.get_or_set then
-        return _G[lua_gui_element.tags.get_or_set](lua_gui_element),lua_gui_element.tags.id
-    end
-    local type_value=ELEMENTTYPE_VALUE[lua_gui_element.type:gsub("-","_")]
-    if type_value then
-        return ((type(type_value)=="function" and type_value(lua_gui_element))
-            or (type(type_value)=="table" and lua_gui_element[type_value[1]])),lua_gui_element.tags.id
+    if lua_gui_element.tags.id then
+        if lua_gui_element.tags.get_or_set then
+            return _G[lua_gui_element.tags.get_or_set](lua_gui_element),lua_gui_element.tags.id
+        end
+        local type_value=ELEMENTTYPE_VALUE[lua_gui_element.type:gsub("-","_")]
+        if type_value then
+            return ((type(type_value)=="function" and type_value(lua_gui_element))
+                or (type(type_value)=="table" and lua_gui_element[type_value[1]])),lua_gui_element.tags.id
+        end
     end
     local result={}
     for _,child in pairs(lua_gui_element.children) do
-        data,index=get_lua_gui_element_data(child)
-        if data and index then
-            result[index]=data
+        local data,index=get_lua_gui_element_data(child)
+        if data then
+            if index then
+                result[index]=data
+            else
+                for k,v in pairs(data) do
+                    result[k]=v
+                end
+            end
         end
     end
     return result,lua_gui_element.tags.id
