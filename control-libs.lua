@@ -10,7 +10,7 @@ local function update_gui(event)
 		if event.element.tags.on_action then
 			_G[event.element.tags.on_action](event.element)
 		end
-		if event.element.tags.id then
+		if event.element and event.element.valid and event.element.tags.id then
 			update_control_behavior()
 		end
 	end
